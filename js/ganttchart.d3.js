@@ -12,7 +12,7 @@ d3.gantt = function() {
         bottom: 20,
         left: 150
     };
-    var selector = '#gantt-chart';
+    var selector = 'body';
     var timeDomainStart = d3.time.day.offset(new Date(), -3);
     var timeDomainEnd = d3.time.hour.offset(new Date(), +3);
     var timeDomainMode = FIT_TIME_DOMAIN_MODE; // fixed or fit
@@ -20,6 +20,8 @@ d3.gantt = function() {
     var taskStatus = [];
     var height = document.body.clientHeight - margin.top - margin.bottom - 5;
     var width = document.body.clientWidth - margin.right - margin.left - 5;
+    var colorScale = null;
+    var heightScale = null;
 
     var tickFormat = "%H:%M";
 
@@ -67,10 +69,34 @@ d3.gantt = function() {
         yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
     };
 
+    var initColorScale = function(tasks) {
+        tasks.sort(function(a,b) {
+            return a.color - b.color;
+        });
+        var minColor = tasks[0].color;
+        var maxColor = tasks[tasks.length - 1].color;
+        colorScale = d3.scale.category20()
+            .domain([minColor, maxColor]);
+            //.range(['pink', 'lightblue']);
+    }
+
+    var initHeightScale = function(tasks) {
+        tasks.sort(function(a,b) {
+            return a.height - b.height;
+        });
+        var minHeight = tasks[0].height;
+        var maxHeight = tasks[tasks.length - 1].height;
+        heightScale = d3.scale.linear()
+            .domain([minHeight, maxHeight])
+            .range([y.rangeBand() / 4, y.rangeBand() ]);
+    }
+
     function gantt(tasks) {
 
         initTimeDomain(tasks);
+        initColorScale(tasks);
         initAxis();
+        initHeightScale(tasks);
 
         var svg = d3.select(selector)
             .append("svg")
@@ -94,15 +120,17 @@ d3.gantt = function() {
                 }
                 return taskStatus[d.status];
             })
-            .attr("y", 0)
+            .attr("y", function(d) {
+                return y.rangeBand() - heightScale(d.height);
+            })
             .attr("transform", rectTransform)
             .attr("height", function(d) {
-                return y.rangeBand();
+                return heightScale(d.height);
             })
             .attr("width", function(d) {
                 return (x(d.endDate) - x(d.startDate));
             })
-            .style("fill", function(d) { return d.color; });
+            .style("fill", function(d) { return colorScale(d.color); });
 
 
         svg.append("g")
