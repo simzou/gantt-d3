@@ -1,5 +1,5 @@
 TODO
     - Display a Legend
-    - Tooltips
-    - Color Scale
-    - sample data
+    - DONE - Tooltips
+    - DONE - Color Scale
+    - DONE - sample data

@@ -98,6 +98,7 @@ d3.gantt = function() {
         initAxis();
         initHeightScale(tasks);
 
+
         var svg = d3.select(selector)
             .append("svg")
             .attr("class", "chart")
@@ -108,6 +109,16 @@ d3.gantt = function() {
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+        var tip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function(d) {
+            console.log(d);
+            return "<strong>Frequency:</strong> <span style='color:red'>" + d.height.toString() + "</span>";
+          })
+
+        svg.call(tip);
 
         svg.selectAll(".chart")
             .data(tasks, keyFunction).enter()
@@ -130,7 +141,21 @@ d3.gantt = function() {
             .attr("width", function(d) {
                 return (x(d.endDate) - x(d.startDate));
             })
-            .style("fill", function(d) { return colorScale(d.color); });
+            .style("fill", function(d) { return colorScale(d.color); })
+
+            .on('mouseover', function(d) {
+                d3.select(this)
+                    .attr("opacity", 0.5);
+
+                console.log(d);
+            })
+            .on('mouseover', tip.show)
+            .on('mouseout', function(d) {
+                d3.select(this)
+                    .attr("opacity", 1.0);
+                console.log("im out");
+                tip.hide()
+            } );
 
 
         svg.append("g")
