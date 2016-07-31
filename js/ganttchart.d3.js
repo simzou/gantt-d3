@@ -140,6 +140,9 @@ d3.gantt = function() {
             .attr("width", function(d) {
                 return (x(d.endDate) - x(d.startDate));
             })
+            .attr("data-legend", function(d) {
+                return d.color;
+            })
             .style("fill", function(d) { return colorScale(d.color); })
 
             .on('mouseover', function(d) {
@@ -154,6 +157,12 @@ d3.gantt = function() {
                 console.log("im out");
                 tip.hide()
             } );
+            
+        legend = svg.append("g")
+          .attr("class","legend")
+          .attr("transform","translate(50,30)")
+          .style("font-size","12px")
+          .call(d3.legend)
 
 
         svg.append("g")
