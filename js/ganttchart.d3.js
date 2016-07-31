@@ -114,7 +114,6 @@ d3.gantt = function() {
           .attr('class', 'd3-tip')
           .offset([-10, 0])
           .html(function(d) {
-            console.log(d);
             return "<strong>Frequency:</strong> <span style='color:red'>" + d.height.toString() + "</span>";
           })
 
@@ -146,10 +145,9 @@ d3.gantt = function() {
             .on('mouseover', function(d) {
                 d3.select(this)
                     .attr("opacity", 0.5);
-
+                tip.show(d);
                 console.log(d);
             })
-            .on('mouseover', tip.show)
             .on('mouseout', function(d) {
                 d3.select(this)
                     .attr("opacity", 1.0);
